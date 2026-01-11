@@ -190,3 +190,18 @@ Content-Type: application/json
 ---
 
 ✅ **Стан: стабільна версія, готова до використання**
+
+/project$ sudo nano /etc/systemd/system/signal_server.service
+
+[Unit]
+Description=Flask Signal Server
+After=network.target
+
+[Service]
+User=yoghurt
+WorkingDirectory=/home/yoghurt/project
+Environment="PATH=/home/yoghurt/project/venv/bin"
+ExecStart=/home/yoghurt/project/venv/bin/gunicorn -w 4 -b 0.0.0.0:5000 app:app
+
+[Install]
+WantedBy=multi-user.target
