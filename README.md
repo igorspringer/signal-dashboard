@@ -205,3 +205,47 @@ ExecStart=/home/yoghurt/project/venv/bin/gunicorn -w 4 -b 0.0.0.0:5000 app:app
 
 [Install]
 WantedBy=multi-user.target
+
+
+
+sudo rm /etc/nginx/sites-enabled/default
+sudo nano /etc/nginx/sites-available/signal_server
+
+server {
+    listen 80;
+    server_name _;
+
+    # Статика
+    location /static/ {
+        alias /home/yoghurt/project/static/;
+        expires 30d;
+        access_log off;
+    }
+
+    # API + Flask
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+sudo ln -s /etc/nginx/sites-available/signal_server /etc/nginx/sites-enabled/
+
+
+sudo chmod o+rx /home/yoghurt
+sudo chmod o+rx /home/yoghurt/project
+sudo chmod o+rx /home/yoghurt/project/static
+sudo chmod o+rx /home/yoghurt/project/static/css
+sudo chmod o+rx /home/yoghurt/project/static/js
+
+sudo chmod o+r /home/yoghurt/project/static/css/*
+sudo chmod o+r /home/yoghurt/project/static/js/*
+sudo chmod o+r /home/yoghurt/project/static/favicon.ico
+
+sudo -u www-data ls /home/yoghurt/project/static/css
+sudo -u www-data ls /home/yoghurt/project/static/js
+sudo -u www-data cat /home/yoghurt/project/static/css/style.css
+curl -i http://10.10.38.113/static/css/style.css

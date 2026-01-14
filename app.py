@@ -70,6 +70,22 @@ def add_signal():
 
     return jsonify({"status": "ok"})
 
+@app.route("/api/health")
+def health():
+    try:
+        conn = get_db()
+        conn.execute("SELECT 1")
+        conn.close()
+        return jsonify({
+            "status": "ok",
+            "time": datetime.utcnow().isoformat()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e)
+        }), 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
